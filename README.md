@@ -11,7 +11,7 @@
 
 ## Project Structure
 
-`./data`: The data used in the project.
+`./data`: The data used in the project. `./data/order` and `./data/trade` should be stored the folder.
 
 `./src`: The source code of the project.
 
