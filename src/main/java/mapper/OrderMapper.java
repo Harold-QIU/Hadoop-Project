@@ -15,7 +15,7 @@ public class OrderMapper extends Mapper<LongWritable, Text, Text, Text> {
 
         // 判断证券代码，时间是否合法
         String securityID = fields[8];
-        long transactTime = Long.parseLong(fields[10]);
+        long transactTime = Long.parseLong(fields[12]);
         if (!validate(securityID, transactTime)) return;
 
         // k: ApplSeqNum
