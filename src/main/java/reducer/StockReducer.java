@@ -82,7 +82,7 @@ public class StockReducer extends Reducer<Text, Text, Text, Text> {
      * @return 转换后的时间
      */
     protected String tConvert(String t) {
-        Date date = null;
+        Date date;
         try {
             date = inputFormat.parse(t);
         } catch (ParseException e) {
