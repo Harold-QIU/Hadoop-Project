@@ -24,9 +24,12 @@ public class StockReducer extends Reducer<Text, Text, Text, Text> {
     /**
      * 转换后的时间格式
      */
-    SimpleDateFormat outputFormat = new SimpleDateFormat("M/d/yyyy h:mm:ss a");
+    SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS");
     @Override
     protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+        // 清空priceSet
+        priceSet.clear();
+
         // 判断传入value是order还是trade
         for (Text value: values) {
             String[] split = value.toString().split(",");
@@ -58,6 +61,12 @@ public class StockReducer extends Reducer<Text, Text, Text, Text> {
             context.write(null, new Text(v));
         }
 
+        // 处理MarketOrder
+        if (order[4].equals("1")) {
+            v = tConvert(order[2]) + ",," + order[1] + "," + order[3] + "," + order[4] + "," + key + "," + priceSet.size() + "," + 2;
+            context.write(null, new Text(v));
+        }
+
         // 判断trade是否为空
         if (trade == null) {
             return;
@@ -66,12 +75,6 @@ public class StockReducer extends Reducer<Text, Text, Text, Text> {
         // 处理Cancel
         if (trade[2].equals("4")) {
             v = tConvert(trade[3]) + ",," + trade[1] + "," +  order[3] + "," + order[4] + "," + key + ",," + 1;
-            context.write(null, new Text(v));
-        }
-
-        // 处理MarketOrder
-        if (trade[2].equals("F")) {
-            v = tConvert(order[2]) + ",," + order[1] + "," + order[3] + "," + order[4] + "," + key + "," + priceSet.size() + "," + 2;
             context.write(null, new Text(v));
         }
 
