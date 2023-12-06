@@ -48,13 +48,13 @@ public class StockReducer extends Reducer<Text, Text, Text, Text> {
 
         // 处理SpecOrder
         if (order[4].equals("U")) {
-            v = tConvert(order[2]) + ",," + order[1] + "," + order[3] + "," + order[4] + ",," + 2;
+            v = tConvert(order[2]) + ",," + order[1] +  "," + order[3] + "," + order[4] + "," + key + ",," + 2;
             context.write(null, new Text(v));
         }
 
         // 处理LimitedOrder
         if (order[4].equals("2")) {
-            v = tConvert(order[2]) + "," + order[0] + "," + order[1] + "," + order[3] + "," + order[4] + ",," + 2;
+            v = tConvert(order[2]) + "," + order[0] + "," + order[1] + "," + order[3] + "," + order[4] + "," + key + ",," + 2;
             context.write(null, new Text(v));
         }
 
@@ -65,13 +65,13 @@ public class StockReducer extends Reducer<Text, Text, Text, Text> {
 
         // 处理Cancel
         if (trade[2].equals("4")) {
-            v = tConvert(trade[3]) + ",," + trade[1] + "," +  order[3] + "," + order[4] + ",," + 1;
+            v = tConvert(trade[3]) + ",," + trade[1] + "," +  order[3] + "," + order[4] + "," + key + ",," + 1;
             context.write(null, new Text(v));
         }
 
         // 处理MarketOrder
         if (trade[2].equals("F")) {
-            v = tConvert(order[2]) + ",," + order[1] + "," + order[3] + "," + order[4] + "," + priceSet.size() + "," + 2;
+            v = tConvert(order[2]) + ",," + order[1] + "," + order[3] + "," + order[4] + "," + key + "," + priceSet.size() + "," + 2;
             context.write(null, new Text(v));
         }
 
