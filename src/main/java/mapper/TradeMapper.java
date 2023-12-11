@@ -9,6 +9,7 @@ import java.io.IOException;
 public class TradeMapper extends Mapper<LongWritable, Text, Text, Text> {
     Text k1;
     Text k2;
+    String str;
     @Override
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
         String input = value.toString();
@@ -20,18 +21,18 @@ public class TradeMapper extends Mapper<LongWritable, Text, Text, Text> {
         if (!validate(securityID, transactTime)) return;
 
         // v: Price, TradeQty, ExecType, tradeTime
-        Text v = new Text(fields[12] + "," + fields[13] + "," + fields[14] + "," + fields[15]);
+        str = fields[12] + "," + fields[13] + "," + fields[14] + "," + fields[15];
 
-        // k1: BidApplSeqNum
+        // k1: BidApplSeqNum + buy flag
         if (!fields[10].equals("0")) {
             k1 = new Text(fields[10]);
-            context.write(k1, v);
+            context.write(k1, new Text(str + ",b"));
         }
 
-        // k2: OfferApplSeqNum
+        // k2: OfferApplSeqNum + sale flag
         if (!fields[11].equals("0")) {
             k2 = new Text(fields[11]);
-            context.write(k2, v);
+            context.write(k2, new Text(str + ",s"));
         }
 
     }

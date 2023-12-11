@@ -6,17 +6,20 @@ import org.apache.hadoop.mapreduce.Reducer;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 
 public class StockReducer extends Reducer<Text, Text, Text, Text> {
     protected String[] order;
-    protected String[] trade;
+    protected ArrayList<String[]> cancelList = new ArrayList<>();
     protected String v;
     /**
      * 用于存储MarketOrder的价格
      */
     protected HashSet<String> priceSet = new HashSet<>();
+    protected
     /**
      * 原时间格式
      */
@@ -27,54 +30,64 @@ public class StockReducer extends Reducer<Text, Text, Text, Text> {
     SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS000");
     @Override
     protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
-        // 清空priceSet
+        // 清空order, cancelList, priceSet
+        order = null;
+        cancelList.clear();
         priceSet.clear();
 
         // 判断传入value是order还是trade
         for (Text value: values) {
             String[] split = value.toString().split(",");
-            if (split.length == 5) {
+            if (!split[4].equals("b") && !split[4].equals("s")) {
                 // v: Price, OrderQty, TransactTime, Side, OrderType
                 order = split;
             } else {
-                // v: Price, TradeQty, ExecType, tradeTime
-                trade = split;
-                if (trade[2].equals("F")) {
-                    priceSet.add(trade[0]);
+                // v: Price, TradeQty, ExecType, tradeTime, b or s
+                if (split[2].equals("F")) {
+                    priceSet.add(split[0]);
+                } else {
+                    cancelList.add(split);
                 }
             }
         }
 
-        if (order == null) {
-            return;
+        if (order != null) {
+            // 处理Order
+            switch (order[4]) {
+                case "U": // 处理SpecOrder
+                    v = tConvert(order[2]) + ",," + order[1] + "," + order[3] + "," + order[4] + "," + key + ",," + 2;
+                    context.write(null, new Text(v));
+                    break;
+                case "2": // 处理LimitedOrder
+                    v = tConvert(order[2]) + "," + order[0] + "," + order[1] + "," + order[3] + "," + order[4] + "," + key + ",," + 2;
+                    context.write(null, new Text(v));
+                    break;
+                case "1": // 处理MarketOrder
+                    v = tConvert(order[2]) + ",," + order[1] + "," + order[3] + "," + order[4] + "," + key + "," + priceSet.size() + "," + 2;
+                    context.write(null, new Text(v));
+                    break;
+            }
         }
 
-        // 处理Order
-        switch (order[4]) {
-            case "U": // 处理SpecOrder
-                v = tConvert(order[2]) + ",," + order[1] + "," + order[3] + "," + order[4] + "," + key + ",," + 2;
-                context.write(null, new Text(v));
-                break;
-            case "2": // 处理LimitedOrder
-                v = tConvert(order[2]) + "," + order[0] + "," + order[1] + "," + order[3] + "," + order[4] + "," + key + ",," + 2;
-                context.write(null, new Text(v));
-                break;
-            case "1": // 处理MarketOrder
-                v = tConvert(order[2]) + ",," + order[1] + "," + order[3] + "," + order[4] + "," + key + "," + priceSet.size() + "," + 2;
-                context.write(null, new Text(v));
-                break;
-        }
 
+        // 判断cancelList是否为空
+        if (!cancelList.isEmpty()) {
+            // 处理Cancel
+            for (String[] trade: cancelList) {
+                if (order != null) {
+                    v = tConvert(trade[3]) + ",," + trade[1] + "," + order[3] + "," + order[4] + "," + key + ",," + 1;
+                    context.write(null, new Text(v));
+                } else {
+                    if (trade[4].equals("b")) {
+                        v = tConvert(trade[3]) + ",," + trade[1] + ",1,2," + key + ",," + 1;
+                        context.write(null, new Text(v));
+                    } else {
+                        v = tConvert(trade[3]) + ",," + trade[1] + ",2,2," + key + ",," + 1;
+                        context.write(null, new Text(v));
+                    }
+                }
 
-        // 判断trade是否为空
-        if (trade == null) {
-            return;
-        }
-
-        // 处理Cancel
-        if (trade[2].equals("4")) {
-            v = tConvert(trade[3]) + ",," + trade[1] + "," + order[3] + "," + order[4] + "," + key + ",," + 1;
-            context.write(null, new Text(v));
+            }
         }
 
     }
