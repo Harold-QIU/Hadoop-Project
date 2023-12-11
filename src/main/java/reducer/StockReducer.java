@@ -24,7 +24,7 @@ public class StockReducer extends Reducer<Text, Text, Text, Text> {
     /**
      * 转换后的时间格式
      */
-    SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS");
+    SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS000");
     @Override
     protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
         // 清空priceSet
