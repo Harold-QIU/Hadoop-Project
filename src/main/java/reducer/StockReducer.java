@@ -49,23 +49,22 @@ public class StockReducer extends Reducer<Text, Text, Text, Text> {
             return;
         }
 
-        // 处理SpecOrder
-        if (order[4].equals("U")) {
-            v = tConvert(order[2]) + ",," + order[1] +  "," + order[3] + "," + order[4] + "," + key + ",," + 2;
-            context.write(null, new Text(v));
+        // 处理Order
+        switch (order[4]) {
+            case "U": // 处理SpecOrder
+                v = tConvert(order[2]) + ",," + order[1] + "," + order[3] + "," + order[4] + "," + key + ",," + 2;
+                context.write(null, new Text(v));
+                break;
+            case "2": // 处理LimitedOrder
+                v = tConvert(order[2]) + "," + order[0] + "," + order[1] + "," + order[3] + "," + order[4] + "," + key + ",," + 2;
+                context.write(null, new Text(v));
+                break;
+            case "1": // 处理MarketOrder
+                v = tConvert(order[2]) + ",," + order[1] + "," + order[3] + "," + order[4] + "," + key + "," + priceSet.size() + "," + 2;
+                context.write(null, new Text(v));
+                break;
         }
 
-        // 处理LimitedOrder
-        if (order[4].equals("2")) {
-            v = tConvert(order[2]) + "," + order[0] + "," + order[1] + "," + order[3] + "," + order[4] + "," + key + ",," + 2;
-            context.write(null, new Text(v));
-        }
-
-        // 处理MarketOrder
-        if (order[4].equals("1")) {
-            v = tConvert(order[2]) + ",," + order[1] + "," + order[3] + "," + order[4] + "," + key + "," + priceSet.size() + "," + 2;
-            context.write(null, new Text(v));
-        }
 
         // 判断trade是否为空
         if (trade == null) {
@@ -74,7 +73,7 @@ public class StockReducer extends Reducer<Text, Text, Text, Text> {
 
         // 处理Cancel
         if (trade[2].equals("4")) {
-            v = tConvert(trade[3]) + ",," + trade[1] + "," +  order[3] + "," + order[4] + "," + key + ",," + 1;
+            v = tConvert(trade[3]) + ",," + trade[1] + "," + order[3] + "," + order[4] + "," + key + ",," + 1;
             context.write(null, new Text(v));
         }
 
