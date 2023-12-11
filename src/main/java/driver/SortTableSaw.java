@@ -7,7 +7,7 @@ import tech.tablesaw.io.csv.CsvReadOptions;
 public class SortTableSaw {
     public static void main(String[] args) {
         ColumnType[] types = {ColumnType.STRING,
-                ColumnType.STRING,
+                ColumnType.DOUBLE,
                 ColumnType.INTEGER,
                 ColumnType.INTEGER,
                 ColumnType.STRING,
