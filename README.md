@@ -25,3 +25,7 @@
 - [ ] 修改程序逻辑至97分以上
 - [ ] 记录原有MapReduce每一个板块的性能指标
 - [ ] 尝试使用StringBuilder来连接字符串
+
+## Attention
+
+- 所有没有order的cancel trade的ORDER_TYPE均标记为2
