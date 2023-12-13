@@ -10,7 +10,7 @@ public class SortManual {
         // 读入文件
         List<String> lines = Files.readAllLines(Paths.get("output/part-r-00000"));
 
-        // 重写排序规则：首先按照时间戳排序，然后按照订单ID排序
+        // 重写排序规则：首先按照时间戳排序，然后按照订单号排序
         lines.sort((o1, o2) -> {
             String[] o1s = o1.split(",");
             String[] o2s = o2.split(",");
