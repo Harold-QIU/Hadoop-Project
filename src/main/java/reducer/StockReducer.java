@@ -59,7 +59,9 @@ public class StockReducer extends Reducer<Text, Text, Text, Text> {
                     context.write(null, new Text(v));
                     break;
                 case "2": // 处理LimitedOrder
-                    v = tConvert(order[2]) + "," + order[0] + "," + order[1] + "," + order[3] + "," + order[4] + "," + key + ",," + 2;
+                    // 将价格转换为double，再转换为String
+                    double price = Double.parseDouble(order[0]);
+                    v = tConvert(order[2]) + "," + price + "," + order[1] + "," + order[3] + "," + order[4] + "," + key + ",," + 2;
                     context.write(null, new Text(v));
                     break;
                 case "1": // 处理MarketOrder
