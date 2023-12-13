@@ -39,7 +39,7 @@ public class StockAnalysis {
         FileOutputFormat.setOutputPath(job, new Path("output/"));
 
         // 提交任务并等待完成
-        System.exit(job.waitForCompletion(true) ? 0 : 1);
+        System.out.println("MapReduce Status:" + (job.waitForCompletion(true) ? 0 : 1));
 
         // 排序准备：读入文件
         List<String> lines = Files.readAllLines(Paths.get("output/part-r-00000"));
