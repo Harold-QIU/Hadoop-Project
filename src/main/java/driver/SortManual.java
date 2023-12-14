@@ -21,7 +21,11 @@ public class SortManual {
             }
         });
 
-        // 输出到文件
+        // 加入表头
+        String header = "TIMESTAMP,PRICE,SIZE,BUY_SELL_FLAG,ORDER_TYPE,ORDER_ID,MARKET_ORDER_TYPE,CANCEL_TYPE";
+        lines.add(0, header);
+
+        // 输出表主体
         Files.write(Paths.get("output/sorted.csv"), lines);
     }
 }
