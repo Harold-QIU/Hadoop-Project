@@ -81,10 +81,10 @@ public class StockReducer extends Reducer<Text, Text, Text, Text> {
                     context.write(null, new Text(v));
                 } else {
                     if (trade[4].equals("b")) {
-                        v = tConvert(trade[3]) + ",," + trade[1] + ",1,2," + key + ",," + 1;
+                        v = tConvert(trade[3]) + ",," + trade[1] + ",1,0," + key + ",," + 1;
                         context.write(null, new Text(v));
                     } else {
-                        v = tConvert(trade[3]) + ",," + trade[1] + ",2,2," + key + ",," + 1;
+                        v = tConvert(trade[3]) + ",," + trade[1] + ",2,0," + key + ",," + 1;
                         context.write(null, new Text(v));
                     }
                 }
