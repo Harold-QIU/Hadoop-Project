@@ -33,6 +33,6 @@ public class OrderMapper extends Mapper<LongWritable, Text, Text, Text> {
      * @return 证券代发和委托时间是否合法
      */
     protected boolean validate(String securityID, long transactTime) {
-        return securityID.equals("000001") && transactTime >= 20190102093000000L && (transactTime <= 20190102113100000L || transactTime >= 20190102133000000L) && transactTime <= 20190102145700000L;
+        return securityID.equals("000001") && transactTime >= 20190102093000000L && (transactTime < 20190102113100000L || transactTime >= 20190102130000000L) && transactTime < 20190102145800000L;
     }
 }
