@@ -29,10 +29,5 @@
             <artifactId>logback-classic</artifactId>
             <version>1.2.6</version>
         </dependency>
-        <dependency>
-            <groupId>tech.tablesaw</groupId>
-            <artifactId>tablesaw-core</artifactId>
-            <version>LATEST</version>
-        </dependency>
     </dependencies>
 </project>
