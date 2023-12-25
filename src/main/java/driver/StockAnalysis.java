@@ -9,26 +9,26 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.fs.FileSystem;
 import reducer.StockReducer;
 
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
+import java.io.*;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 
 
 public class StockAnalysis {
-    public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException {
+    public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException, URISyntaxException {
         // 创建配置对象和任务对象
         Configuration conf = new Configuration();
         Job job = Job.getInstance(conf, "StockAnalysis");
-        job.setJarByClass(StockAnalysis.class);
+        job.setJarByClass(StockAnalysisLocal.class);
 
         // 设置第一个输入路径和对应的Map处理逻辑及输出类型: 目标为data/order目录下的所有文件
-        MultipleInputs.addInputPath(job, new Path("data/order"), TextInputFormat.class, OrderMapper.class);
+        MultipleInputs.addInputPath(job, new Path(args[0]), TextInputFormat.class, OrderMapper.class);
         // 设置第二个输入路径和对应的Map处理逻辑及输出类型: 目标为data/trade目录下的所有文件
-        MultipleInputs.addInputPath(job, new Path("data/trade"), TextInputFormat.class, TradeMapper.class);
+        MultipleInputs.addInputPath(job, new Path(args[1]), TextInputFormat.class, TradeMapper.class);
 
         // 设置Reduce处理逻辑及输出类型
         job.setReducerClass(StockReducer.class);
@@ -36,13 +36,21 @@ public class StockAnalysis {
         job.setOutputValueClass(Text.class);
 
         // 设置输出路径
-        FileOutputFormat.setOutputPath(job, new Path("output/"));
+        FileOutputFormat.setOutputPath(job, new Path(args[2]));
 
         // 提交任务并等待完成
         System.out.println("MapReduce Status:" + (job.waitForCompletion(true) ? 0 : 1));
 
+        // 获取HDFS的文件系统对象
+        FileSystem fs = FileSystem.get(conf);
+
         // 排序准备：读入文件
-        List<String> lines = Files.readAllLines(Paths.get("output/part-r-00000"));
+        Path pt = new Path(args[2], "part-r-00000");
+        BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(pt)));
+        ArrayList<String> lines = new ArrayList<>();
+        do {
+            lines.add(br.readLine());
+        } while (br.ready());
 
         // 重写排序规则：首先按照时间戳排序，然后按照订单号排序
         lines.sort((o1, o2) -> {
@@ -59,8 +67,13 @@ public class StockAnalysis {
         String header = "TIMESTAMP,PRICE,SIZE,BUY_SELL_FLAG,ORDER_TYPE,ORDER_ID,MARKET_ORDER_TYPE,CANCEL_TYPE";
         lines.add(0, header);
 
-        // 输出表主体
-        Files.write(Paths.get("output/sorted.csv"), lines);
+        // 输出表主体到HDFS
+        Path pt2 = new Path(args[2], "sorted.csv");
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fs.create(pt2, true)));
+        for (String line: lines) {
+            bw.write(line);
+            bw.newLine();
+        }
     }
 
 }
