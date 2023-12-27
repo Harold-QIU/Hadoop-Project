@@ -1,6 +1,5 @@
 package mapper;
 
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -15,8 +14,7 @@ public class OrderMapper extends Mapper<LongWritable, Text, Text, Text> {
 
         // 判断证券代码，时间是否合法
         String securityID = fields[8];
-        long transactTime = Long.parseLong(fields[12]);
-        if (!validate(securityID, transactTime)) return;
+        if (!validate(securityID, fields[12])) return;
 
         // k: ApplSeqNum
         Text k = new Text(fields[7]);
@@ -32,7 +30,7 @@ public class OrderMapper extends Mapper<LongWritable, Text, Text, Text> {
      * @param transactTime 委托时间
      * @return 证券代发和委托时间是否合法
      */
-    protected boolean validate(String securityID, long transactTime) {
-        return securityID.equals("000001") && transactTime >= 20190102093000000L && (transactTime < 20190102113100000L || transactTime >= 20190102130000000L) && transactTime < 20190102145700000L;
+    protected boolean validate(String securityID, String transactTime) {
+        return securityID.equals("000001") && transactTime.compareTo("20190102093000000") >= 0 && (transactTime.compareTo("20190102113100000") < 0 || transactTime.compareTo("20190102130000000") >= 0) && transactTime.compareTo("20190102145700000") < 0;
     }
 }
