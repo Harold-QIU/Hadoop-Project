@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 
@@ -19,15 +18,15 @@ public class StockReducer extends Reducer<Text, Text, Text, Text> {
      * 用于存储MarketOrder的价格
      */
     protected HashSet<String> priceSet = new HashSet<>();
-    protected
     /**
      * 原时间格式
      */
-    SimpleDateFormat inputFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+    protected SimpleDateFormat inputFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
     /**
      * 转换后的时间格式
      */
-    SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS000");
+    protected SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS000");
+
     @Override
     protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
         // 清空order, cancelList, priceSet
@@ -36,7 +35,7 @@ public class StockReducer extends Reducer<Text, Text, Text, Text> {
         priceSet.clear();
 
         // 判断传入value是order还是trade
-        for (Text value: values) {
+        for (Text value : values) {
             String[] split = value.toString().split(",");
             if (!split[4].equals("b") && !split[4].equals("s")) {
                 // v: Price, OrderQty, TransactTime, Side, OrderType
@@ -75,7 +74,7 @@ public class StockReducer extends Reducer<Text, Text, Text, Text> {
         // 判断cancelList是否为空
         if (!cancelList.isEmpty()) {
             // 处理Cancel
-            for (String[] trade: cancelList) {
+            for (String[] trade : cancelList) {
                 if (order != null) {
                     v = tConvert(trade[3]) + ",," + trade[1] + "," + order[3] + "," + order[4] + "," + key + ",," + 1;
                     context.write(null, new Text(v));
