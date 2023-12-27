@@ -14,12 +14,11 @@ import reducer.StockReducer;
 
 
 import java.io.*;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 
 public class StockAnalysis {
-    public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException, URISyntaxException {
+    public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException {
         // 创建配置对象和任务对象
         Configuration conf = new Configuration();
         Job job = Job.getInstance(conf, "StockAnalysis");
@@ -74,6 +73,7 @@ public class StockAnalysis {
             bw.write(line);
             bw.newLine();
         }
+        bw.flush();
     }
 
 }
