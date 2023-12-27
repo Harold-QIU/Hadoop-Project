@@ -22,7 +22,7 @@ public class StockAnalysisLocal {
     public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException {
         // 创建配置对象和任务对象
         Configuration conf = new Configuration();
-        Job job = Job.getInstance(conf, "StockAnalysis");
+        Job job = Job.getInstance(conf, "StockAnalysisLocal");
         job.setJarByClass(StockAnalysisLocal.class);
 
         // 设置第一个输入路径和对应的Map处理逻辑及输出类型: 目标为data/order目录下的所有文件
